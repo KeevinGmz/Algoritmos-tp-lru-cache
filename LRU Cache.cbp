@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="LRU Cache" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="LRU Cache Lista">
+				<Option output="lib/LruCacheList" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-ansi" />
+					<Add option="-ggdb" />
+					<Add option="-g" />
+					<Add directory="includes" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/LRU Cache" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Test LRU Cache P1">
+				<Option output="LRU Cache" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-ggdb" />
+					<Add option="-g" />
+					<Add directory="includes" />
+				</Compiler>
+				<Linker>
+					<Add option="-lLruCacheList" />
+					<Add directory="lib" />
+				</Linker>
+			</Target>
+			<Target title="Test LRU Cache P2">
+				<Option output="LRU Cache" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add directory="includes" />
+				</Compiler>
+				<Linker>
+					<Add option="-lLruCacheIndex" />
+					<Add directory="lib" />
+				</Linker>
+			</Target>
+			<Target title="LRU Cache Indice">
+				<Option output="lib/LruCacheIndex" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
+					<Add option="-ansi" />
+					<Add option="-g" />
+					<Add directory="includes" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Test/test_lru_cache_parte1.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="Test LRU Cache P1" />
+		</Unit>
+		<Unit filename="Test/test_lru_cache_parte2.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="Test LRU Cache P2" />
+		</Unit>
+		<Unit filename="Test/tests_comunes.h">
+			<Option target="Release" />
+			<Option target="Test LRU Cache P1" />
+			<Option target="Test LRU Cache P2" />
+		</Unit>
+		<Unit filename="includes/lru_cache_index.h">
+			<Option target="Release" />
+			<Option target="Test LRU Cache P2" />
+			<Option target="LRU Cache Indice" />
+		</Unit>
+		<Unit filename="includes/lru_cache_list.h">
+			<Option target="LRU Cache Lista" />
+			<Option target="Release" />
+			<Option target="Test LRU Cache P1" />
+		</Unit>
+		<Unit filename="includes/lru_types.h" />
+		<Unit filename="includes/test_framework.h">
+			<Option target="Release" />
+			<Option target="Test LRU Cache P1" />
+			<Option target="Test LRU Cache P2" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/lru_cache_index.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="LRU Cache Indice" />
+		</Unit>
+		<Unit filename="src/lru_cache_list.c">
+			<Option compilerVar="CC" />
+			<Option target="LRU Cache Lista" />
+			<Option target="Release" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
