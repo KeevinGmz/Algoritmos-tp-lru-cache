@@ -38,7 +38,6 @@
 /* Cada suite aporta su propio header: lru_cache_list.h y lru_cache_index.h
  * declaran los mismos tipos y funciones con firmas distintas, asi que no
  * pueden convivir en la misma unidad de traduccion. */
-#include <lru_cache_list.h>
 #include <lru_types.h>
 #include <test_framework.h>
 
@@ -137,7 +136,7 @@ static lru_status_t cache_borrar(lru_cache_t *cache, int clave) {
   registro_t registro;
 
   registro_init(&registro, clave, 0);
-  return lru_cache_remove(cache, &registro, sizeof(registro));
+  return lru_cache_remove(cache, &registro);
 }
 
 /* Sobre una lista vacia, obtener y borrar informan LRU_ERR_EMPTY; con

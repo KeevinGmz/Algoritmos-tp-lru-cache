@@ -6,7 +6,7 @@ lru_status_t lru_cache_init(lru_cache_t *cache, unsigned int max_cache_size,
 			    lru_cmp_t cmp)
 {
 	if (!cmp || max_cache_size <= 0)
-		return LRU_ERR_PARAM;
+		return ;
 
 	cache->head = NULL;
 	cache->max_cache_size = max_cache_size;

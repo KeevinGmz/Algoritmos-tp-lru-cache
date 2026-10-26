@@ -22,3 +22,4 @@ lru_status_t lru_cache_get(lru_cache_t* cache, void* data, const unsigned tam);
 void lru_clear(lru_cache_t* cache);
 
 #endif
+

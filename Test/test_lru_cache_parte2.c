@@ -29,7 +29,7 @@
 
 /* La parte 2 no recibe el tamanio del buffer de destino: el adaptador lo
  * ignora y las primitivas copian el dato almacenado completo. */
-#define CACHE_GET(cache, dato, tam) lru_cache_get((cache), (dato))
+#define CACHE_GET(cache, dato, tam) lru_cache_get((cache), (dato),(tam))
 
 #include "tests_comunes.h"
 
@@ -312,7 +312,7 @@ TEST(borrar_y_reinsertar_alternados_mantiene_ambas_estructuras) {
 		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, clave, &leido), "obtener");
 		ASSERT_EQUAL(ciclo, leido, "el valor debe ser el ultimo agregado");
 		ASSERT_EQUAL(LRU_OK, cache_borrar(&cache, clave), "borrar");
-		ASSERT_EQUAL(LRU_ERR_NOT_FOUND, cache_obtener(&cache, clave, &leido),
+		ASSERT_EQUAL(LRU_ERR_EMPTY, cache_obtener(&cache, clave, &leido),
 		             "despues de borrar no debe quedar rastro en el indice");
 		ASSERT_TRUE(cache_cantidad(&cache) <= 5,
 		            "la capacidad nunca debe superarse");
