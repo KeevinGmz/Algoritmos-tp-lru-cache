@@ -136,7 +136,7 @@ static lru_status_t cache_borrar(lru_cache_t *cache, int clave) {
   registro_t registro;
 
   registro_init(&registro, clave, 0);
-  return lru_cache_remove(cache, &registro);
+  return lru_cache_remove(cache, &registro,sizeof(registro_t));
 }
 
 /* Sobre una lista vacia, obtener y borrar informan LRU_ERR_EMPTY; con

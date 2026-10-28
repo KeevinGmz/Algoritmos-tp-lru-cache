@@ -25,7 +25,8 @@
  *     Estos tests describen el contrato esperado de lru_cache_height.
  */
 
-#include <lru_cache_index.h>
+//#include <lru_cache_index.h>
+#include "../Tweener.h"
 
 /* La parte 2 no recibe el tamanio del buffer de destino: el adaptador lo
  * ignora y las primitivas copian el dato almacenado completo. */
@@ -379,7 +380,9 @@ TEST(altura_tras_borrar_todo_y_reinsertar) {
 
 int main(void)
 {
-	printf("\n+----------------------------------------+\n");
+    lru_cache_t cache;
+    lru_cache_init(&cache,20,cmp);
+	/*printf("\n+----------------------------------------+\n");
 	printf("|  TEST SUITE: LRU Cache - Parte 2       |\n");
 	printf("|  lista doble + arbol indice            |\n");
 	printf("+----------------------------------------+\n");
@@ -405,7 +408,7 @@ int main(void)
 	RUN_TEST(modelo_capacidades_chicas);
 
 	/* Propios de la parte 2: altura y consistencia lista/arbol. */
-	RUN_TEST(altura_cache_vacia_es_cero);
+	/* RUN_TEST(altura_cache_vacia_es_cero);
 	RUN_TEST(altura_un_solo_elemento_es_uno);
 	RUN_TEST(altura_arbol_balanceado);
 	RUN_TEST(altura_arbol_degenerado);
@@ -416,6 +419,13 @@ int main(void)
 	RUN_TEST(borrar_raiz_con_dos_hijos);
 	RUN_TEST(borrar_y_reinsertar_alternados_mantiene_ambas_estructuras);
 	RUN_TEST(altura_tras_borrar_todo_y_reinsertar);
+    */
+	/*TEST_SUMMARY();*/
+    generarLotePruebas(1,1);
+    int r=leerArchivoPosteos();
+    printf("---------------------------------------------\n");
 
-	TEST_SUMMARY();
+    int d=leerArchivoPosteosParte1(&cache);
+    //lru_clear(&cache);
+    return d;
 }

@@ -96,6 +96,10 @@
 			<Option target="Test LRU Cache P1" />
 			<Option target="Test LRU Cache P2" />
 		</Unit>
+		<Unit filename="Tweener.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Tweener.h" />
 		<Unit filename="includes/lru_cache_index.h">
 			<Option target="Release" />
 			<Option target="Test LRU Cache P2" />
