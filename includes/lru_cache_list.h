@@ -1,6 +1,8 @@
 #ifndef LRU_CACHE_LIST_H
 #define LRU_CACHE_LIST_H
 #include <lru_types.h>
+
+
 typedef struct lru_cache_node_s {
 	struct lru_cache_node_s* next;
 	void* data;

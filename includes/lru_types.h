@@ -11,7 +11,8 @@ typedef enum {
 	LRU_ERR_PARAM = -4,    /* puntero nulo o tamano nulo */
 	LRU_ERR_TAM = -5,      /* el buffer no puede contener el dato */
 	LRU_ERR_INVAL = -6,     /* primitiva que la version no tiene */
-	LRU_ERR_EMPTY = -7     /*lista vacia*/
+	LRU_ERR_EMPTY = -7,     /*lista vacia*/
+	LRU_ERR_NO_CREADO = -8
 } lru_status_t;
 
 
