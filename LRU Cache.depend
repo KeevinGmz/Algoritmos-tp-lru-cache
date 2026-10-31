@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1793473196 source:/home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/src/lru_cache_list.c
+	<lru_cache_list.h>
+	<string.h>
+	<stdlib.h>
+
+1793473869 /home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/includes/lru_cache_list.h
+	<lru_types.h>
+
+1793467453 /home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/includes/lru_types.h
+
+1793476467 source:/home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/main.c
+	"Tweener.h"
+	<stdio.h>
+
+1793476336 /home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/Tweener.h
+	<lru_cache.h>
+
+1793474218 /home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/includes/lru_cache.h
+	<lru_cache_list.h>
+	<lru_cache_index.h>
+
+1793473912 /home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/includes/lru_cache_index.h
+	<lru_types.h>
+
+1793473267 source:/home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/src/lru_cache_index.c
+	<lru_cache_index.h>
+	<string.h>
+	<stdlib.h>
+
+1793476404 source:/home/agustin/Dev/Unlam/Algoritmos-tp-lru-cache/Tweener.c
+	"Tweener.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<windows.h>
+	<sys/stat.h>
+

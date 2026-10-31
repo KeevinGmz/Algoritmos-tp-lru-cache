@@ -6,7 +6,7 @@ lru_status_t lru_cache_init(lru_cache_t *cache, unsigned int max_cache_size,
 			    lru_cmp_t cmp)
 {
 	if (!cmp || max_cache_size <= 0)
-		return ;
+		return LRU_ERR_NO_CREADO;
 
 	cache->head = NULL;
 	cache->max_cache_size = max_cache_size;
@@ -101,7 +101,7 @@ lru_status_t lru_cache_get(lru_cache_t *cache, void *data, const unsigned tam)
 	lru_cache_node_t *act = cache->head;
 	lru_cache_node_t *prev = NULL;
 	if (!act)
-		return LRU_ERR_EMPTY;
+		return LRU_MISS;
 
 	while (act && cache->cmp(act->data, data) != 0) {
 		prev = act;
@@ -109,7 +109,7 @@ lru_status_t lru_cache_get(lru_cache_t *cache, void *data, const unsigned tam)
 	}
 
 	if (!act)
-		return LRU_ERR_NOT_FOUND;
+		return LRU_MISS;
 
 	memcpy(data, act->data, MIN(tam, act->tam));
 	if (prev) {
@@ -118,10 +118,10 @@ lru_status_t lru_cache_get(lru_cache_t *cache, void *data, const unsigned tam)
 		act->next = cache->head;
 		cache->head = act;
 	}
-	return LRU_OK;
+	return LRU_HIT;
 }
 
-void lru_clear(lru_cache_t *cache)
+int lru_clear(lru_cache_t *cache)
 {
 	if (cache) {
 		lru_cache_node_t *act = cache->head;
@@ -135,4 +135,5 @@ void lru_clear(lru_cache_t *cache)
 		cache->head = NULL;
 		cache->current_size = 0;
 	}
+	return LRU_OK;
 }
