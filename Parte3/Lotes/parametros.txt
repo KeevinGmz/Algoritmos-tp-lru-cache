@@ -1,0 +1,15 @@
+Generador de lotes del TP LRU Cache
+Semilla: 2026
+Posteos: 50000
+Usuarios por lote: 1000
+Posteos por usuario: 20
+Conjunto frecuente: 100
+Identificadores de posteos: 0 a 49999
+Tamano de tp_posteo_t: 148 bytes
+Tamano de tp_usuario_t: 96 bytes
+Los archivos no tienen encabezado: contienen structs consecutivos.
+Acceso directo: fseek(archivo, (long)id * sizeof(tp_posteo_t), SEEK_SET).
+Concentrado: 20 distintos por usuario dentro del conjunto frecuente.
+Disperso: todos los accesos del lote usan identificadores diferentes.
+Ordenado: los identificadores aumentan en toda la secuencia de lectura.
+Capacidades sugeridas para comparar: 10, 50, 100, 500, 1000.

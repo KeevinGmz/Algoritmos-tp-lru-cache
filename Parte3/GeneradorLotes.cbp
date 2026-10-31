@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+    <FileVersion major="1" minor="6" />
+    <Project>
+        <Option title="Generador de lotes - Parte 3" />
+        <Option compiler="gcc" />
+        <Build>
+            <Target title="Generar lotes">
+                <Option output="bin/generar_lotes" prefix_auto="1" extension_auto="1" />
+                <Option object_output="obj/" />
+                <Option working_dir="." />
+                <Option type="1" />
+                <Option compiler="gcc" />
+                <Compiler>
+                    <Add option="-ansi" />
+                    <Add option="-pedantic" />
+                    <Add option="-Wall" />
+                    <Add option="-Wextra" />
+                    <Add directory="../includes" />
+                </Compiler>
+            </Target>
+        </Build>
+        <Unit filename="generar_lotes.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../includes/datos_simulacion.h" />
+    </Project>
+</CodeBlocks_project_file>
