@@ -136,7 +136,7 @@ static lru_status_t cache_borrar(lru_cache_t *cache, int clave) {
   registro_t registro;
 
   registro_init(&registro, clave, 0);
-  return lru_cache_remove(cache, &registro);
+  return lru_cache_remove(cache, &registro,sizeof(registro_t));
 }
 
 /* Sobre una lista vacia, obtener y borrar informan LRU_ERR_EMPTY; con
@@ -364,17 +364,17 @@ TEST(capacidad_amplia_no_descarta) {
 
   ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 10, cmp_int), "iniciar");
   for (i = 0; i < 5; i++) {
-    claves[i] = i;
-    valores[i] = i * 10;
-    ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], valores[i]),
+    *(claves + i) = i;
+    *(valores + i) = i * 10;
+    ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), *(valores + i)),
                  "agregar elemento");
   }
   ASSERT_EQUAL(5, (int)cache_cantidad(&cache), "nada debe descartarse");
   for (i = 4; i >= 0; i--) {
     leido = 0;
-    ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, claves[i], &leido),
+    ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, *(claves + i), &leido),
                  "todo debe seguir presente");
-    ASSERT_EQUAL(valores[i], leido, "el valor debe ser el correcto");
+    ASSERT_EQUAL(*(valores + i), leido, "el valor debe ser el correcto");
   }
 
   lru_clear(&cache);
@@ -595,7 +595,7 @@ static unsigned modelo_buscar(const modelo_t *modelo, int clave) {
   unsigned i;
 
   for (i = 0; i < MODELO_MAX; i++) {
-    if (modelo->entradas[i].presente && modelo->entradas[i].clave == clave) {
+    if ((modelo->entradas + i)->presente && (modelo->entradas + i)->clave == clave) {
       return i;
     }
   }
@@ -610,35 +610,38 @@ static void modelo_agregar(modelo_t *modelo, int clave, int valor) {
   i = modelo_buscar(modelo, clave);
   modelo->reloj++;
   if (i != MODELO_MAX) {
-    modelo->entradas[i].valor = valor;
-    modelo->entradas[i].sello = modelo->reloj;
+    (modelo->entradas + i)->valor = valor;
+    (modelo->entradas + i)->sello = modelo->reloj;
     return;
   }
 
-  for (i = 0; i < MODELO_MAX; i++) {
-    if (!modelo->entradas[i].presente) {
-      break;
+  i = 0;
+
+  while (i < MODELO_MAX &&
+       (modelo->entradas + i)->presente)
+    {
+    i++;
     }
-  }
-  modelo->entradas[i].presente = 1;
-  modelo->entradas[i].clave = clave;
-  modelo->entradas[i].valor = valor;
-  modelo->entradas[i].sello = modelo->reloj;
+
+  (modelo->entradas + i)->presente = 1;
+  (modelo->entradas + i)->clave = clave;
+  (modelo->entradas + i)->valor = valor;
+  (modelo->entradas + i)->sello = modelo->reloj;
   modelo->cantidad++;
 
   if (modelo->cantidad > modelo->capacidad) {
     victima = MODELO_MAX;
     menor = 0;
     for (i = 0; i < MODELO_MAX; i++) {
-      if (!modelo->entradas[i].presente) {
+      if (!(modelo->entradas + i)->presente) {
         continue;
       }
-      if (victima == MODELO_MAX || modelo->entradas[i].sello < menor) {
+      if (victima == MODELO_MAX || (modelo->entradas + i)->sello < menor) {
         victima = i;
-        menor = modelo->entradas[i].sello;
+        menor = (modelo->entradas + i)->sello;
       }
     }
-    modelo->entradas[victima].presente = 0;
+    (modelo->entradas + victima)->presente = 0;
     modelo->cantidad--;
   }
 }
@@ -651,8 +654,8 @@ static int modelo_obtener(modelo_t *modelo, int clave, int *valor) {
     return 0;
   }
   modelo->reloj++;
-  modelo->entradas[i].sello = modelo->reloj;
-  *valor = modelo->entradas[i].valor;
+  (modelo->entradas + i)->sello = modelo->reloj;
+  *valor = (modelo->entradas + i)->valor;
   return 1;
 }
 
@@ -663,7 +666,7 @@ static int modelo_borrar(modelo_t *modelo, int clave) {
   if (i == MODELO_MAX) {
     return 0;
   }
-  modelo->entradas[i].presente = 0;
+  (modelo->entradas + i)->presente = 0;
   modelo->cantidad--;
   return 1;
 }

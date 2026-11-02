@@ -1,10 +1,14 @@
 #ifndef DATOS_SIMULACION_H
 #define DATOS_SIMULACION_H
 
+
+
 #define TP_CANT_POSTEOS 50000
 #define TP_TAM_TEXTO 141
 #define TP_TAM_USUARIO 15
 #define TP_TAM_FEED 20
+
+
 
 typedef struct {
     int id;

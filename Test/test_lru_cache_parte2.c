@@ -25,7 +25,8 @@
  *     Estos tests describen el contrato esperado de lru_cache_height.
  */
 
-#include <lru_cache_index.h>
+//#include <lru_cache_index.h>
+#include "../Tweener.h"
 
 /* La parte 2 no recibe el tamanio del buffer de destino: el adaptador lo
  * ignora y las primitivas copian el dato almacenado completo. */
@@ -65,17 +66,17 @@ TEST(altura_arbol_balanceado) {
 	int i;
 
 	/* Insercion en orden raiz-izq-der: 8 / 4,12 / 2,6,10,14 -> altura 3. */
-	claves[0] = 8;
-	claves[1] = 4;
-	claves[2] = 12;
-	claves[3] = 2;
-	claves[4] = 6;
-	claves[5] = 10;
-	claves[6] = 14;
+	*(claves + 0) = 8;
+	*(claves + 1) = 4;
+	*(claves + 2) = 12;
+	*(claves + 3) = 2;
+	*(claves + 4) = 6;
+	*(claves + 5) = 10;
+	*(claves + 6) = 14;
 
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 10, cmp_int), "iniciar");
 	for (i = 0; i < 7; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], 1), "agregar");
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), 1), "agregar");
 	}
 	ASSERT_EQUAL(3, (int)lru_cache_height(&cache),
 	             "un arbol completo de 3 niveles tiene altura 3");
@@ -187,17 +188,17 @@ TEST(borrar_nodo_hoja_del_arbol) {
 	int leido = 0;
 
 	/* Arbol: 50 / 30,70 / 20,40,60,80. 10 queda como hoja de 20. */
-	claves[0] = 50;
-	claves[1] = 30;
-	claves[2] = 70;
-	claves[3] = 20;
-	claves[4] = 40;
-	claves[5] = 60;
-	claves[6] = 80;
+	*(claves + 0) = 50;
+	*(claves + 1) = 30;
+	*(claves + 2) = 70;
+	*(claves + 3) = 20;
+	*(claves + 4) = 40;
+	*(claves + 5) = 60;
+	*(claves + 6) = 80;
 
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 20, cmp_int), "iniciar");
 	for (i = 0; i < 7; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], 1), "agregar");
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), 1), "agregar");
 	}
 	ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claveHoja, 1),
 	             "agregar hoja 10");
@@ -208,7 +209,7 @@ TEST(borrar_nodo_hoja_del_arbol) {
 	             "la hoja borrada no debe encontrarse");
 	for (i = 0; i < 7; i++) {
 		leido = 0;
-		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, claves[i], &leido),
+		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, *(claves + i), &leido),
 		             "el resto del indice debe seguir intacto");
 		ASSERT_EQUAL(1, leido, "con su valor");
 	}
@@ -225,18 +226,18 @@ TEST(borrar_nodo_con_un_hijo_del_arbol) {
 	int leido = 0;
 
 	/* Arbol: 50 / 30,70 / 20,40,60,80 / 10 (hijo izquierdo de 20). */
-	claves[0] = 50;
-	claves[1] = 30;
-	claves[2] = 70;
-	claves[3] = 20;
-	claves[4] = 40;
-	claves[5] = 60;
-	claves[6] = 80;
-	claves[7] = 10;
+	*(claves + 0) = 50;
+	*(claves + 1) = 30;
+	*(claves + 2) = 70;
+	*(claves + 3) = 20;
+	*(claves + 4) = 40;
+	*(claves + 5) = 60;
+	*(claves + 6) = 80;
+	*(claves + 7) = 10;
 
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 20, cmp_int), "iniciar");
 	for (i = 0; i < 8; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], 1), "agregar");
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), 1), "agregar");
 	}
 
 	ASSERT_EQUAL(LRU_OK, cache_borrar(&cache, claveConHijo),
@@ -245,14 +246,14 @@ TEST(borrar_nodo_con_un_hijo_del_arbol) {
 	ASSERT_EQUAL(LRU_ERR_NOT_FOUND, cache_obtener(&cache, claveConHijo,
 	             &leido), "el nodo borrado no debe encontrarse");
 	leido = 0;
-	ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, claves[7], &leido),
+	ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, *(claves + 7), &leido),
 	             "el hijo huerfano debe seguir en el indice");
 	ASSERT_EQUAL(1, leido, "con su valor");
 	for (i = 0; i < 7; i++) {
-		if (claves[i] == claveConHijo) {
+		if (*(claves + i) == claveConHijo) {
 			continue; /* la clave borrada no debe seguir */
 		}
-		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, claves[i], &leido),
+		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, *(claves + i), &leido),
 		             "el resto debe seguir disponible");
 	}
 
@@ -268,17 +269,17 @@ TEST(borrar_raiz_con_dos_hijos) {
 	int leido = 0;
 
 	/* Arbol: 50 / 30,70 / 20,40,60,80. La raiz tiene dos hijos. */
-	claves[0] = 50;
-	claves[1] = 30;
-	claves[2] = 70;
-	claves[3] = 20;
-	claves[4] = 40;
-	claves[5] = 60;
-	claves[6] = 80;
+	*(claves + 0) = 50;
+	*(claves + 1) = 30;
+	*(claves + 2) = 70;
+	*(claves + 3) = 20;
+	*(claves + 4) = 40;
+	*(claves + 5) = 60;
+	*(claves + 6) = 80;
 
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 20, cmp_int), "iniciar");
 	for (i = 0; i < 7; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], 1), "agregar");
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), 1), "agregar");
 	}
 
 	ASSERT_EQUAL(LRU_OK, cache_borrar(&cache, claveRaiz),
@@ -288,7 +289,7 @@ TEST(borrar_raiz_con_dos_hijos) {
 	             "la raiz borrada no debe encontrarse");
 	for (i = 1; i < 7; i++) {
 		leido = 0;
-		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, claves[i], &leido),
+		ASSERT_EQUAL(LRU_OK, cache_obtener(&cache, *(claves + i), &leido),
 		             "los seis restantes deben seguir");
 		ASSERT_EQUAL(1, leido, "con su valor");
 	}
@@ -333,27 +334,27 @@ TEST(altura_tras_borrar_todo_y_reinsertar) {
 	int i;
 	int clave;
 
-	claves[0] = 1;
-	claves[1] = 2;
-	claves[2] = 3;
-	claves[3] = 4;
-	claves[4] = 5;
-	claves[5] = 6;
-	claves[6] = 7;
-	orden[0] = 5;
-	orden[1] = 3;
-	orden[2] = 8;
-	orden[3] = 1;
+	*(claves + 0) = 1;
+	*(claves + 1) = 2;
+	*(claves + 2) = 3;
+	*(claves + 3) = 4;
+	*(claves + 4) = 5;
+	*(claves + 5) = 6;
+	*(claves + 6) = 7;
+	*(orden + 0) = 5;
+	*(orden + 1) = 3;
+	*(orden + 2) = 8;
+	*(orden + 3) = 1;
 
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 20, cmp_int), "iniciar");
 	for (i = 0; i < 7; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, claves[i], 1),
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(claves + i), 1),
 		             "agregar creciente");
 	}
 	ASSERT_EQUAL(7, (int)lru_cache_height(&cache), "arbol degenerado inicial");
 
 	for (i = 0; i < 7; i++) {
-		clave = claves[i];
+		clave = *(claves + i);
 		ASSERT_EQUAL(LRU_OK, cache_borrar(&cache, clave), "borrar");
 	}
 	ASSERT_EQUAL(0, (int)cache_cantidad(&cache), "quedo vacia");
@@ -361,7 +362,7 @@ TEST(altura_tras_borrar_todo_y_reinsertar) {
 	             "altura cero tras borrar todo");
 
 	for (i = 0; i < 4; i++) {
-		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, orden[i], 1), "reinsertar");
+		ASSERT_EQUAL(LRU_OK, cache_agregar(&cache, *(orden + i), 1), "reinsertar");
 	}
 	ASSERT_EQUAL(3, (int)lru_cache_height(&cache), "5 / 3,8 / 1 -> altura tres");
 	ASSERT_EQUAL(4, (int)cache_cantidad(&cache), "cuatro elementos");
@@ -377,7 +378,7 @@ TEST(altura_tras_borrar_todo_y_reinsertar) {
  * Main
  * ========================================================================== */
 
-int main(void)
+ int main(void)
 {
 	printf("\n+----------------------------------------+\n");
 	printf("|  TEST SUITE: LRU Cache - Parte 2       |\n");
@@ -419,3 +420,54 @@ int main(void)
 
 	TEST_SUMMARY();
 }
+
+/*int main(void)
+{
+    lru_cache_t cache;
+    lru_cache_init(&cache,20,cmp);
+	printf("\n+----------------------------------------+\n");
+	printf("|  TEST SUITE: LRU Cache - Parte 2       |\n");
+	printf("|  lista doble + arbol indice            |\n");
+	printf("+----------------------------------------+\n");
+
+	RUN_TEST(iniciar_capacidad_cero_falla);
+	RUN_TEST(iniciar_cache_vacia);
+	RUN_TEST(insertar_y_obtener_un_entero);
+	RUN_TEST(obtener_clave_inexistente_no_altera_la_cache);
+	RUN_TEST(desborde_descarta_el_menos_usado);
+	RUN_TEST(obtener_promueve_al_frente);
+	RUN_TEST(orden_lru_completo);
+	RUN_TEST(reemplazo_de_clave_existente_actualiza_y_promueve);
+	RUN_TEST(capacidad_uno);
+	RUN_TEST(capacidad_amplia_no_descarta);
+	RUN_TEST(borrar_elemento_existente);
+	RUN_TEST(borrar_clave_inexistente_informa_error);
+	RUN_TEST(borrar_permite_reinsertar);
+	RUN_TEST(vaciar_deja_la_cache_reutilizable);
+	RUN_TEST(datos_de_tipo_definido_por_el_usuario);
+	RUN_TEST(claves_de_texto);
+	RUN_TEST(varias_claves_con_el_mismo_prefijo);
+	RUN_TEST(secuencia_larga_contra_modelo);
+	RUN_TEST(modelo_capacidades_chicas);
+
+	RUN_TEST(altura_cache_vacia_es_cero);
+	RUN_TEST(altura_un_solo_elemento_es_uno);
+	RUN_TEST(altura_arbol_balanceado);
+	RUN_TEST(altura_arbol_degenerado);
+	RUN_TEST(altura_no_cambia_al_reemplazar_ni_al_obtener);
+	RUN_TEST(altura_tras_desborde_y_borrado);
+	RUN_TEST(borrar_nodo_hoja_del_arbol);
+	RUN_TEST(borrar_nodo_con_un_hijo_del_arbol);
+	RUN_TEST(borrar_raiz_con_dos_hijos);
+	RUN_TEST(borrar_y_reinsertar_alternados_mantiene_ambas_estructuras);
+	RUN_TEST(altura_tras_borrar_todo_y_reinsertar);
+
+	TEST_SUMMARY();
+    generarLotePruebas(1,1);
+    int r=leerArchivoPosteos();
+    printf("---------------------------------------------\n");
+
+    int d=leerArchivoPosteosParte1(&cache);
+    //lru_clear(&cache);
+    return d;
+} */

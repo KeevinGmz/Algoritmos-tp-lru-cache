@@ -63,7 +63,7 @@ TEST(obtener_buffer_corto_con_dato_de_usuario)
 	ASSERT_EQUAL(LRU_OK, lru_cache_init(&cache, 2, cmp_int), "iniciar");
 	ASSERT_EQUAL(LRU_OK, lru_cache_insert(&cache, &alumno, sizeof(alumno)),
 		     "agregar alumno");
-	ASSERT_TRUE(leido.nombre[0] == '\0', "no debe escribirse el nombre");
+	ASSERT_TRUE(*(leido.nombre + 0) == '\0', "no debe escribirse el nombre");
 	ASSERT_EQUAL(1, (int)cache_cantidad(&cache), "la cantidad no cambia");
 
 	lru_clear(&cache);

@@ -1,3 +1,5 @@
+
+
 #include <datos_simulacion.h>
 #include <errno.h>
 #include <limits.h>
@@ -11,10 +13,14 @@
 #include <sys/stat.h>
 #endif
 
+
+
 #define TAM_RUTA 1024
 #define MODO_CONCENTRADO 0
 #define MODO_DISPERSO 1
 #define MODO_ORDENADO 2
+
+
 
 /* Generador de 32 bits: no depende de la implementacion de rand(). */
 static unsigned long siguiente(unsigned long *estado)
@@ -28,16 +34,19 @@ static int leer_numero(const char *texto, unsigned long *valor)
     char *fin;
     const char *p;
 
-    if (!*texto)
+    if (*texto == '\0')
         return 0;
+
     for (p = texto; *p; p++)
         if (*p < '0' || *p > '9')
             return 0;
 
     errno = 0;
     *valor = strtoul(texto, &fin, 10);
+
     return errno != ERANGE && *fin == '\0';
 }
+
 
 static FILE *abrir_salida(const char *carpeta, const char *nombre,
                          const char *modo)
@@ -50,10 +59,13 @@ static FILE *abrir_salida(const char *carpeta, const char *nombre,
         fprintf(stderr, "La ruta de salida es demasiado larga.\n");
         return NULL;
     }
+
     sprintf(ruta, "%s/%s", carpeta, nombre);
     archivo = fopen(ruta, modo);
-    if (!archivo)
+
+    if (archivo == NULL)
         perror(ruta);
+
     return archivo;
 }
 
@@ -65,17 +77,22 @@ static int generar_posteos(const char *carpeta, unsigned long semilla)
     int i;
 
     archivo = abrir_salida(carpeta, "posteos.dat", "wb");
-    if (!archivo)
+
+
+    if (archivo == NULL)
         return 0;
 
     estado = semilla;
+
     for (i = 0; i < TP_CANT_POSTEOS; i++)
     {
-        /* Tambien se inicializa el relleno del struct para repetir los bytes. */
+
         memset(&posteo, 0, sizeof(posteo));
         posteo.id = i;
+
         sprintf(posteo.texto, "Posteo %05d - contenido de prueba %08lX.",
                 i, siguiente(&estado));
+
         if (fwrite(&posteo, sizeof(posteo), 1, archivo) != 1)
         {
             fprintf(stderr, "No se pudo escribir posteos.dat.\n");
@@ -83,6 +100,8 @@ static int generar_posteos(const char *carpeta, unsigned long semilla)
             return 0;
         }
     }
+
+
     return fclose(archivo) == 0;
 }
 
@@ -105,60 +124,82 @@ static int generar_usuarios(const char *carpeta, const char *nombre, int modo,
     int correcto;
 
     indices = malloc(TP_CANT_POSTEOS * sizeof(*indices));
-    if (!indices)
+
+
+    if (indices == NULL)
     {
         fprintf(stderr, "No hay memoria para preparar los identificadores.\n");
         return 0;
     }
+
     for (i = 0; i < TP_CANT_POSTEOS; i++)
-        indices[i] = (int)i;
+        *(indices+i) = (int)i;
 
     estado = semilla;
+
     if (modo != MODO_ORDENADO)
     {
-        /* Permutacion sin repetidos de todos los identificadores. */
+         /* Voy de atras hacia adelante. En cada paso elijo una posicion al azar
+           entre 0 e i, y la intercambio con la posicion i. Al terminar, los ids
+           quedan en orden aleatorio y sin repetidos */
         for (i = TP_CANT_POSTEOS - 1; i > 0; i--)
         {
+            /* Posicion al azar entre 0 e i */
             elegido = (unsigned)(siguiente(&estado) % (i + 1UL));
-            intercambiar(&indices[i], &indices[elegido]);
+
+            intercambiar(indices+i, indices+elegido);
         }
     }
 
     archivo = abrir_salida(carpeta, nombre, "wb");
-    if (!archivo)
+
+
+    if (archivo == NULL)
     {
         free(indices);
         return 0;
     }
 
+    /* correcto vale 1 mientras no haya ningun error */
     correcto = 1;
-    for (i = 0; i < usuarios; i++)
+
+    for (i = 0; i < usuarios && correcto; i++)
     {
         memset(&usuario, 0, sizeof(usuario));
+
+        /* Nombre del usuario: usuario000000, usuario000001, usuario000002, ... */
         sprintf(usuario.usuario, "usuario%06u", i);
+
+         /* Lleno los 20 ids del feed. Aca es donde se distinguen los tres lotes */
         for (j = 0; j < TP_TAM_FEED; j++)
         {
             if (modo == MODO_CONCENTRADO)
             {
                 /* Cada feed elige 20 distintos del mismo conjunto frecuente. */
                 elegido = j + (unsigned)(siguiente(&estado) % (calientes - j));
-                intercambiar(&indices[j], &indices[elegido]);
-                usuario.feed[j] = indices[j];
+                intercambiar(indices+j, indices+elegido);
+                *(usuario.feed+j) = *(indices+j);
             }
+
             else
-                usuario.feed[j] = indices[i * TP_TAM_FEED + j];
+                *(usuario.feed+j) =  *(indices + i * TP_TAM_FEED + j);
         }
 
+        /*Grabo el usuario en el archivo (96 bytes) */
         if (fwrite(&usuario, sizeof(usuario), 1, archivo) != 1)
         {
             fprintf(stderr, "No se pudo escribir %s.\n", nombre);
             correcto = 0;
-            break;
         }
     }
+
     free(indices);
+
+    /* Cierro el archivo. Si falla el cierre, tambien es un error */
     if (fclose(archivo) != 0)
         correcto = 0;
+
+    /* Devuelvo 1 si todo salio bien, 0 si hubo algun error */
     return correcto;
 }
 
@@ -196,6 +237,7 @@ static int escribir_parametros(const char *carpeta, unsigned long semilla,
     return resultado >= 0 && cerrado == 0;
 }
 
+
 int main(int argc, char **argv)
 {
     unsigned long semilla = 2026UL;
@@ -205,16 +247,26 @@ int main(int argc, char **argv)
     const char *carpeta = "Lotes";
     int creado;
 
-    if (argc > 5 || (argc > 1 && !leer_numero(argv[1], &semilla)) ||
-        (argc > 2 && !leer_numero(argv[2], &usuarios)) ||
-        (argc > 4 && !leer_numero(argv[4], &calientes)))
+    /*argc = cantidad de argumentos (el 0 es el nombre del programa).
+    *(argv + 1) = semilla, *(argv + 2) = usuarios, *(argv + 3) = carpeta,
+    *(argv + 4) = frecuentes.
+    Este if detecta argumentos mal escritos */
+
+    if (argc > 5 || (argc > 1 && !leer_numero(*(argv + 1), &semilla)) ||
+        (argc > 2 && !leer_numero(*(argv + 2), &usuarios)) ||
+        (argc > 4 && !leer_numero(*(argv + 4), &calientes)))
     {
         fprintf(stderr,
             "Uso: generar_lotes [semilla] [usuarios] [carpeta] [frecuentes]\n");
         return EXIT_FAILURE;
     }
+
     if (argc > 3)
-        carpeta = argv[3];
+        carpeta = *(argv + 3);
+
+    /*comprueba que la computadora guarde los datos de forma estándar,
+    para que los archivos .dat sirvan en cualquier PC.*/
+
     if (CHAR_BIT != 8 || sizeof(int) != 4 ||
         *((unsigned char *)&orden_bytes) != 1 ||
         sizeof(tp_posteo_t) != 148 || sizeof(tp_usuario_t) != 96)
@@ -222,6 +274,8 @@ int main(int argc, char **argv)
         fprintf(stderr, "Se necesita int de 32 bits, little endian y alineacion normal.\n");
         return EXIT_FAILURE;
     }
+
+
     if (semilla > 0xFFFFFFFFUL || usuarios < 200 ||
         usuarios > TP_CANT_POSTEOS / TP_TAM_FEED ||
         calientes < TP_TAM_FEED || calientes > TP_CANT_POSTEOS)
@@ -230,6 +284,9 @@ int main(int argc, char **argv)
             "Semilla: 0..4294967295. Usuarios: 200..2500. Frecuentes: 20..50000.\n");
         return EXIT_FAILURE;
     }
+
+    /*crea la carpeta de salida. Si ya existía, sigue.
+    Si falla por otro motivo, avisa y termina.*/
 
 #ifdef _WIN32
     creado = _mkdir(carpeta);
@@ -241,6 +298,13 @@ int main(int argc, char **argv)
         perror(carpeta);
         return EXIT_FAILURE;
     }
+
+     /* GENERAR LOS ARCHIVOS, en este orden:
+         1. posteos.dat (uno solo, compartido)
+         2. usuarios_concentrado.dat
+         3. usuarios_disperso.dat
+         4. usuarios_ordenado.dat
+         5. parametros.txt */
 
     if (!generar_posteos(carpeta, semilla) ||
         !generar_usuarios(carpeta, "usuarios_concentrado.dat", MODO_CONCENTRADO,
@@ -256,5 +320,6 @@ int main(int argc, char **argv)
     printf("Lotes generados en: %s\n", carpeta);
     printf("Semilla: %lu. Posteos: %d. Usuarios por lote: %lu.\n",
            semilla, TP_CANT_POSTEOS, usuarios);
+
     return EXIT_SUCCESS;
 }
